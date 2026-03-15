@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import SocialLogin from '@/app/SocialLogin/page'
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -144,7 +145,7 @@ const RegisterPage = () => {
         >
           {loading ? "Processing..." : "REGISTER NOW"}
         </button>
-
+        <SocialLogin></SocialLogin>
         <p className="text-slate-400 text-center mt-6 text-sm">
           Already have an account?{" "}
           <Link

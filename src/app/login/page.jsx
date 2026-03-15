@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import SocialLogin from '@/app/SocialLogin/page'
 
 const page = () => {
   const router = useRouter();
@@ -90,6 +91,8 @@ const page = () => {
         >
           {loading ? "Verifying..." : "LOGIN"}
         </button>
+        
+        <SocialLogin></SocialLogin>
 
         <p className="text-slate-400 text-center mt-6 text-sm">
           Don't have an account?{" "}
