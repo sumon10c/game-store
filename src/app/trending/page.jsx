@@ -1,5 +1,6 @@
 import React from "react";
 import { dbConnect } from "@/mongodb/dbConnect";
+import Link from "next/link";
 
 const page = async () => {
   const gamesCollection = dbConnect("games");
@@ -53,15 +54,17 @@ const page = async () => {
                   </span>
                 </div>
 
-                <button className="w-full bg-slate-800 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
-                  View Details
-                </button>
+                <Link
+                  href={`/games/${game._id.toString()}`}
+                  className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors text-center"
+                >
+                  Details
+                </Link>
               </div>
             </div>
           ))}
         </div>
 
-        {/* যদি কোনো ডেটা না পাওয়া যায় */}
         {trendingGames.length === 0 && (
           <div className="text-center py-20">
             <p className="text-slate-500 text-xl font-medium">

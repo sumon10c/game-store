@@ -1,18 +1,17 @@
 import React from "react";
 import { dbConnect } from "@/mongodb/dbConnect";
+import Link from "next/link";
 
 const page = async () => {
   const gamesCollection = dbConnect("games");
 
- 
   const newGames = await gamesCollection
     .find({ category: "New Release" })
-    .sort({ createdAt: -1 }) 
+    .sort({ createdAt: -1 })
     .toArray();
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-6">
       <div className="max-w-7xl mx-auto">
-        
         <div className="mb-12 flex items-center gap-4">
           <div className="h-10 w-2 bg-indigo-500 rounded-full"></div>
           <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">
@@ -23,14 +22,12 @@ const page = async () => {
           </span>
         </div>
 
-        {/* ২. গেম কার্ড গ্রিড */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {newGames.map((game) => (
             <div
               key={game._id.toString()}
               className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-indigo-500/40 transition-all duration-300 group flex flex-col shadow-2xl"
             >
-              {/* ইমেজ সেকশন */}
               <div className="relative h-60 overflow-hidden">
                 <img
                   src={game.thumbnail}
@@ -46,7 +43,6 @@ const page = async () => {
                 </div>
               </div>
 
-              {/* কন্টেন্ট সেকশন */}
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">
                   {game.title}
@@ -65,16 +61,18 @@ const page = async () => {
                       {game.genre}
                     </span>
                   </div>
-                  <button className="w-full bg-slate-800 hover:bg-indigo-600 text-white font-bold py-2 rounded-xl transition-all active:scale-95">
-                  View Details
-                  </button>
+                  <Link
+                    href={`/games/${game._id.toString()}`}
+                    className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors text-center"
+                  >
+                    Details
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* ৩. নো ডাটা মেসেজ */}
         {newGames.length === 0 && (
           <div className="text-center py-24 bg-slate-900/50 rounded-3xl border border-dashed border-slate-800">
             <p className="text-slate-500 text-lg italic">

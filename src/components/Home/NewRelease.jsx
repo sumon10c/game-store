@@ -3,18 +3,18 @@ import { dbConnect } from "@/mongodb/dbConnect";
 import Link from "next/link";
 
 const NewRelease = async () => {
-  // ১. ডাটাবেস থেকে শুধু 'New Release' ক্যাটাগরির ৬টি গেম আনা
+  
   const gamesCollection = dbConnect("games");
   const newGames = await gamesCollection
     .find({ category: "New Release" })
-    .sort({ createdAt: -1 }) // নতুনগুলো আগে দেখাবে
+    .sort({ createdAt: -1 }) 
     .limit(6)
     .toArray();
 
   return (
     <section className="bg-slate-950 py-20 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* সেকশন হেডার */}
+       
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">
@@ -30,14 +30,14 @@ const NewRelease = async () => {
           </Link>
         </div>
 
-        {/* ২. গেম কার্ড গ্রিড (৩ কলামে ৬টি গেম) */}
+       
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {newGames.map((game) => (
             <div
               key={game._id.toString()}
               className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:bg-slate-900 transition-all group relative"
             >
-              {/* ইমেজ সেকশন */}
+            
               <div className="relative h-64 w-full overflow-hidden">
                 <img
                   src={game.thumbnail}
@@ -49,7 +49,7 @@ const NewRelease = async () => {
                 </div>
               </div>
 
-              {/* কন্টেন্ট সেকশন */}
+              
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors">
@@ -74,7 +74,7 @@ const NewRelease = async () => {
           ))}
         </div>
 
-        {/* যদি ডেটা না থাকে */}
+       
         {newGames.length === 0 && (
           <div className="text-center text-slate-700 py-10">
             Stay tuned! New games are coming soon.

@@ -2,20 +2,16 @@ import React from "react";
 import { dbConnect } from "@/mongodb/dbConnect";
 import Link from "next/link";
 
-// ১. searchParams এখন async ভাবে ডিক্লেয়ার করতে হবে
 const page = async ({ searchParams }) => {
-  // ২. searchParams কে await করে আনওয়্যাপ (unwrap) করুন
   const params = await searchParams;
   const currentPage = parseInt(params.page) || 1;
   const itemsPerPage = 12;
 
   const gamesCollection = dbConnect("games");
 
-  // মোট গেমের সংখ্যা এবং পেজ ক্যালকুলেশন
   const totalGames = await gamesCollection.countDocuments();
   const totalPages = Math.ceil(totalGames / itemsPerPage);
 
-  // MongoDB থেকে নির্দিষ্ট পেজের ডেটা আনা
   const games = await gamesCollection
     .find({})
     .skip((currentPage - 1) * itemsPerPage)
@@ -57,16 +53,18 @@ const page = async ({ searchParams }) => {
                   <span className="text-xs text-indigo-400 font-semibold uppercase italic">
                     {game.category}
                   </span>
-                  <button className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors">
+                  <Link
+                    href={`/games/${game._id.toString()}`}
+                    className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors text-center"
+                  >
                     Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* ৩. কন্ট্রোল বাটন লজিক */}
         <div className="mt-16 flex justify-center items-center gap-6">
           <Link
             href={`/games?page=${currentPage - 1}`}
