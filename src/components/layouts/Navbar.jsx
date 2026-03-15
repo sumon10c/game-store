@@ -1,11 +1,15 @@
+"use client";
 import React from "react";
 import Link from "next/link";
-import { Gamepad2 } from "lucide-react";
+import { Gamepad2, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
+
   return (
     <div className="navbar bg-slate-950 text-white border-b border-slate-800 sticky top-0 z-50 px-4 md:px-8">
-      {/* 1. Navbar Start: Logo & Mobile Menu */}
+      {/* 1. Navbar Start */}
       <div className="navbar-start">
         <div className="dropdown">
           <div
@@ -45,26 +49,26 @@ const Navbar = () => {
               <Link href="/new-releases">New Releases</Link>
             </li>
             <div className="divider my-1"></div>
-            <li>
-              <Link
-                href="/login"
-                className="btn btn-sm btn-outline btn-primary text-white"
-              >
-                Login
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/register"
-                className="btn btn-sm btn-primary text-white"
-              >
-                Register
-              </Link>
-            </li>
+
+            {!session ? (
+              <>
+                <li>
+                  <Link href="/login">Login</Link>
+                </li>
+                <li>
+                  <Link href="/register">Register</Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <button onClick={() => signOut()} className="text-red-500">
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
 
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group ml-2 lg:ml-0">
           <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform duration-300">
             <Gamepad2 className="w-6 h-6 text-white" />
@@ -75,55 +79,86 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* 2. Navbar Center: Desktop Menu */}
+      {/* 2. Navbar Center */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 gap-2 font-bold uppercase text-sm tracking-wide">
           <li>
-            <Link href="/" className="hover:text-indigo-400 transition-colors">
-              Home
-            </Link>
+            <Link href="/">Home</Link>
           </li>
           <li>
-            <Link
-              href="/games"
-              className="hover:text-indigo-400 transition-colors"
-            >
-              Games Store
-            </Link>
+            <Link href="/games">Games Store</Link>
           </li>
           <li>
-            <Link
-              href="/trending"
-              className="hover:text-indigo-400 transition-colors"
-            >
-              Trending
-            </Link>
+            <Link href="/trending">Trending</Link>
           </li>
           <li>
-            <Link
-              href="/new-releases"
-              className="hover:text-indigo-400 transition-colors"
-            >
-              New Releases
-            </Link>
+            <Link href="/new-releases">New Releases</Link>
           </li>
         </ul>
       </div>
 
-      {/* 3. Navbar End: Auth Buttons */}
       <div className="navbar-end gap-3">
-        <Link
-          href="/login"
-          className="btn btn-ghost btn-sm font-bold hidden sm:flex"
-        >
-          Login
-        </Link>
-        <Link
-          href="/register"
-          className="btn btn-primary btn-sm px-6 font-bold rounded-lg shadow-lg shadow-indigo-500/20"
-        >
-          Register
-        </Link>
+        {status === "loading" ? (
+          <span className="loading loading-spinner loading-sm"></span>
+        ) : !session ? (
+          <>
+            <Link
+              href="/login"
+              className="btn btn-ghost btn-sm font-bold hidden sm:flex"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="btn btn-primary btn-sm px-6 font-bold rounded-lg shadow-lg shadow-indigo-500/20"
+            >
+              Register
+            </Link>
+          </>
+        ) : (
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block text-right">
+              <p className="text-xs font-bold text-white leading-none">
+                {session.user?.name}
+              </p>
+              <p className="text-[10px] text-slate-500">
+                {session.user?.email}
+              </p>
+            </div>
+
+            <div className="dropdown dropdown-end">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar border border-indigo-500"
+              >
+                <div className="w-10 rounded-full">
+                  <img
+                    src={
+                      session.user?.image ||
+                      session.user?.photo ||
+                      "https://i.ibb.co/v38Yf7D/avatar.png"
+                    }
+                    alt="profile"
+                  />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-slate-900 rounded-box z-[1] mt-3 w-52 p-4 shadow-2xl border border-slate-800"
+              >
+                <li>
+                  <Link href="/profile">My Profile</Link>
+                </li>
+                <li>
+                  <button onClick={() => signOut()} className="text-red-400">
+                    Logout <LogOut className="w-4 h-4" />
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

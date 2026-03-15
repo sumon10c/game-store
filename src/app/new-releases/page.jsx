@@ -65,7 +65,7 @@ const page = async () => {
                       {game.genre}
                     </span>
                   </div>
-                  <button className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
+                  <button className="w-full bg-slate-800 hover:bg-indigo-600 text-white font-bold py-2 rounded-xl transition-all active:scale-95">
                   View Details
                   </button>
                 </div>
