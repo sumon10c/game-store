@@ -118,12 +118,10 @@ const Navbar = () => {
         ) : (
           <div className="flex items-center gap-4">
             <div className="hidden md:block text-right">
-              <p className="text-xs font-bold text-white leading-none">
+              <p className="text-sm font-bold text-white leading-none">
                 {session.user?.name}
               </p>
-              <p className="text-[10px] text-slate-500">
-                {session.user?.email}
-              </p>
+            
             </div>
 
             <div className="dropdown dropdown-end">
