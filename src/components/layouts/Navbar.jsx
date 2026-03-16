@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Gamepad2, LogOut } from "lucide-react";
+import { Gamepad2, LogOut, PlusCircle } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
@@ -9,7 +9,6 @@ const Navbar = () => {
 
   return (
     <div className="navbar bg-slate-950 text-white border-b border-slate-800 sticky top-0 z-50 px-4 md:px-8">
-      {/* 1. Navbar Start */}
       <div className="navbar-start">
         <div className="dropdown">
           <div
@@ -42,12 +41,22 @@ const Navbar = () => {
             <li>
               <Link href="/games">Games Store</Link>
             </li>
+
+            {session && (
+              <li>
+                <Link href="/add-games" >
+                  Add Games
+                </Link>
+              </li>
+            )}
+
             <li>
               <Link href="/trending">Trending</Link>
             </li>
             <li>
               <Link href="/new-releases">New Releases</Link>
             </li>
+
             <div className="divider my-1"></div>
 
             {!session ? (
@@ -61,7 +70,10 @@ const Navbar = () => {
               </>
             ) : (
               <li>
-                <button onClick={() => signOut()} className="text-red-500">
+                <button
+                  onClick={() => signOut()}
+                  className="text-red-500 font-bold"
+                >
                   Logout
                 </button>
               </li>
@@ -79,7 +91,6 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* 2. Navbar Center */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 gap-2 font-bold uppercase text-sm tracking-wide">
           <li>
@@ -94,12 +105,24 @@ const Navbar = () => {
           <li>
             <Link href="/new-releases">New Releases</Link>
           </li>
+
+          {session && (
+            <li>
+              <Link
+                href="/add-games"
+                
+              >
+                <PlusCircle className="w-4 h-4" /> Add Games
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
 
+      {/* 3. Navbar End (User Profile & Auth) */}
       <div className="navbar-end gap-3">
         {status === "loading" ? (
-          <span className="loading loading-spinner loading-sm"></span>
+          <span className="loading loading-spinner loading-sm text-indigo-500"></span>
         ) : !session ? (
           <>
             <Link
@@ -110,7 +133,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/register"
-              className="btn btn-primary btn-sm px-6 font-bold rounded-lg shadow-lg shadow-indigo-500/20"
+              className="btn btn-primary btn-sm px-6 font-bold rounded-lg shadow-lg shadow-indigo-500/20 bg-indigo-600 border-none hover:bg-indigo-500 text-white"
             >
               Register
             </Link>
@@ -118,23 +141,24 @@ const Navbar = () => {
         ) : (
           <div className="flex items-center gap-4">
             <div className="hidden md:block text-right">
-              <p className="text-sm font-bold text-white leading-none">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter leading-none mb-1">
+                Welcome,
+              </p>
+              <p className="text-sm font-black text-white leading-none tracking-tight">
                 {session.user?.name}
               </p>
-            
             </div>
 
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-ghost btn-circle avatar border border-indigo-500"
+                className="btn btn-ghost btn-circle avatar border-2 border-indigo-500/50 hover:border-indigo-500 transition-all p-0.5"
               >
-                <div className="w-10 rounded-full">
+                <div className="w-full rounded-full ring ring-offset-2 ring-slate-950">
                   <img
                     src={
                       session.user?.image ||
-                      session.user?.photo ||
                       "https://i.ibb.co/v38Yf7D/avatar.png"
                     }
                     alt="profile"
@@ -143,13 +167,26 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-slate-900 rounded-box z-[1] mt-3 w-52 p-4 shadow-2xl border border-slate-800"
+                className="menu menu-sm dropdown-content bg-slate-900 rounded-box z-[1] mt-3 w-52 p-4 shadow-2xl border border-slate-800 space-y-2"
               >
-                <li>
-                  <Link href="/profile">My Profile</Link>
+                <li className="menu-title text-slate-500 uppercase text-[10px] font-bold tracking-widest px-2">
+                  Account
                 </li>
                 <li>
-                  <button onClick={() => signOut()} className="text-red-400">
+                  <Link
+                    href="/profile"
+                    className="flex items-center justify-between"
+                  >
+                    My Profile
+                    <span className="badge badge-indigo-500 badge-sm">New</span>
+                  </Link>
+                </li>
+                <div className="divider my-0 opacity-20"></div>
+                <li>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-between"
+                  >
                     Logout <LogOut className="w-4 h-4" />
                   </button>
                 </li>

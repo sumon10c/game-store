@@ -3,7 +3,8 @@ const uri = process.env.MONGODB_URI;
 const dbname = process.env.MONGODB_NAME;
 export const collection = {
     PRODUCTS:"games",
-    USERS: "users"
+    USERS: "users",
+    ORDERS:'orders'
 }
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
