@@ -25,6 +25,7 @@ export async function POST(request) {
       email,
       password: hashedPassword,
       photo: photo || "",
+      role: "user",
       createdAt: new Date(),
     });
 
