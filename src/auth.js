@@ -5,8 +5,8 @@ import { dbConnect, collection } from "@/mongodb/dbConnect";
 import bcrypt from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true, // এটি প্রোডাকশনে লোকালহোস্ট এরর দূর করে
   providers: [
-    // ১. গুগল প্রোভাইডার যোগ করা হয়েছে
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -38,7 +38,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    // ২. গুগল দিয়ে লগইন করলে ডাটাবেসে সেভ করার লজিক
     async signIn({ user, account }) {
       if (account.provider === "google") {
         try {
@@ -49,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await usersCollection.insertOne({
               name: user.name,
               email: user.email,
-              photo: user.image, // গুগলের ছবি
+              photo: user.image,
               provider: "google",
               createdAt: new Date(),
             });
@@ -66,7 +65,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // গুগল থেকে আসলে 'image' থাকে, ডাটাবেস থেকে আসলে 'photo'
         token.photo = user.photo || user.image;
       }
       return token;
