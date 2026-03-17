@@ -22,26 +22,24 @@ const ProfilePage = () => {
 
   const isAdmin = session?.user?.role === "admin";
 
-  
   useEffect(() => {
     if (session?.user?.email) {
-      
       const orderQuery = isAdmin
         ? "/api/order"
         : `/api/order?email=${session.user.email}`;
-
       fetch(orderQuery)
         .then((res) => res.json())
         .then((data) => setOrders(data.data || []));
 
-      
-      fetch(`/api/games?email=${session.user.email}`)
+      const productQuery = isAdmin
+        ? "/api/games"
+        : `/api/games?email=${session.user.email}`;
+      fetch(productQuery)
         .then((res) => res.json())
         .then((data) => setMyProducts(data.data || []));
     }
   }, [session, isAdmin]);
 
-  
   const handleUpdateStatus = async (orderId, newStatus) => {
     setLoadingAction(orderId);
     try {
@@ -51,7 +49,6 @@ const ProfilePage = () => {
         body: JSON.stringify({ status: newStatus }),
       });
       const data = await res.json();
-
       if (data.success) {
         setOrders(
           orders.map((order) =>
@@ -76,15 +73,47 @@ const ProfilePage = () => {
     }
   };
 
-  if (status === "loading") {
+  const handleDeleteProduct = async (productId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#334155",
+      confirmButtonText: "Yes, delete it!",
+      background: "#0f172a",
+      color: "#fff",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(`/api/games/${productId}`, {
+            method: "DELETE",
+          });
+          const data = await res.json();
+          if (data.success) {
+            setMyProducts(myProducts.filter((p) => p._id !== productId));
+            Swal.fire({
+              title: "Deleted!",
+              icon: "success",
+              background: "#0f172a",
+              color: "#fff",
+            });
+          }
+        } catch (error) {
+          console.error("Delete failed", error);
+        }
+      }
+    });
+  };
+
+  if (status === "loading")
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <span className="loading loading-spinner loading-lg text-indigo-500"></span>
       </div>
     );
-  }
-
-  if (!session) {
+  if (!session)
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
         <p className="text-xl font-bold italic uppercase tracking-widest">
@@ -92,17 +121,15 @@ const ProfilePage = () => {
         </p>
       </div>
     );
-  }
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
+        {/* Header Design */}
         <div className="bg-slate-900 rounded-[2rem] border border-slate-800 p-8 shadow-2xl mb-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-10">
             {isAdmin ? <ShieldCheck size={120} /> : <UserCircle size={120} />}
           </div>
-
           <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
             <div
               className={`w-24 h-24 rounded-full border-4 ${
@@ -138,15 +165,13 @@ const ProfilePage = () => {
               </p>
             </div>
           </div>
-
-          {/* Tab Navigation */}
           <div className="flex flex-wrap gap-4 mt-8 border-t border-slate-800 pt-6">
             <button
               onClick={() => setActiveTab("profile")}
               className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${
                 activeTab === "profile"
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-800 text-slate-400"
               }`}
             >
               <UserCircle className="w-4 h-4" /> Details
@@ -155,25 +180,23 @@ const ProfilePage = () => {
               onClick={() => setActiveTab("orders")}
               className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${
                 activeTab === "orders"
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-800 text-slate-400"
               }`}
             >
               {isAdmin ? (
                 <Users className="w-4 h-4" />
               ) : (
                 <ShoppingBag className="w-4 h-4" />
-              )}
-              {isAdmin
-                ? `All Orders (${orders.length})`
-                : `My Orders (${orders.length})`}
+              )}{" "}
+              {isAdmin ? "All Orders" : "My Orders"} ({orders.length})
             </button>
             <button
               onClick={() => setActiveTab("products")}
               className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${
                 activeTab === "products"
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-800 text-slate-400"
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />{" "}
@@ -185,7 +208,7 @@ const ProfilePage = () => {
         {/* Tab Content */}
         <div className="min-h-[400px]">
           {activeTab === "profile" && (
-            <div className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem] animate-in fade-in slide-in-from-bottom-4">
+            <div className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem]">
               <h3 className="text-xl font-bold text-white mb-6 uppercase italic tracking-wider">
                 Account Information
               </h3>
@@ -211,7 +234,7 @@ const ProfilePage = () => {
           )}
 
           {activeTab === "orders" && (
-            <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-bottom-4">
+            <div className="grid grid-cols-1 gap-4">
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <div
@@ -254,8 +277,6 @@ const ProfilePage = () => {
                         )}
                       </div>
                     </div>
-
-                    {/* Admin Actions */}
                     {isAdmin && order.status === "pending" && (
                       <div className="flex gap-3 w-full md:w-auto">
                         <button
@@ -284,7 +305,7 @@ const ProfilePage = () => {
                 <div className="text-center py-20 bg-slate-900 rounded-[2rem] border border-dashed border-slate-800">
                   <ShoppingBag className="w-12 h-12 text-slate-700 mx-auto mb-4" />
                   <p className="text-slate-500 font-bold uppercase tracking-widest">
-                    No orders found in the system.
+                    No orders found.
                   </p>
                 </div>
               )}
@@ -292,7 +313,7 @@ const ProfilePage = () => {
           )}
 
           {activeTab === "products" && (
-            <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead className="bg-slate-800/50 text-slate-400 text-xs uppercase font-black tracking-widest">
@@ -331,9 +352,14 @@ const ProfilePage = () => {
                             ${product.price}
                           </td>
                           <td className="p-6 text-right">
-                            <button className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90">
-                              <Trash2 className="w-5 h-5" />
-                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteProduct(product._id)}
+                                className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))
@@ -342,7 +368,7 @@ const ProfilePage = () => {
                         <td colSpan="4" className="p-20 text-center">
                           <LayoutDashboard className="w-12 h-12 text-slate-700 mx-auto mb-4" />
                           <p className="text-slate-500 font-bold uppercase tracking-widest">
-                            Your inventory is empty.
+                            Empty Inventory.
                           </p>
                         </td>
                       </tr>
