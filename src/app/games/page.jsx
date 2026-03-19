@@ -1,17 +1,17 @@
 import React from "react";
 import { dbConnect } from "@/mongodb/dbConnect";
 import Link from "next/link";
-import SearchBar from "@/components/Games/SearchBar"; // ইমপোর্ট করো
+import SearchBar from '@/components/games/SearchBar'
 
 const page = async ({ searchParams }) => {
   const params = await searchParams;
   const currentPage = parseInt(params.page) || 1;
-  const searchQuery = params.search || ""; // সার্চ কুয়েরি ধরো
+  const searchQuery = params.search || ""; 
   const itemsPerPage = 12;
 
   const gamesCollection = await dbConnect("games");
 
-  // সার্চ ফিল্টার তৈরি
+
   const query = searchQuery
     ? { title: { $regex: searchQuery, $options: "i" } }
     : {};
