@@ -1,4 +1,5 @@
 import Banner from "@/components/Home/Banner";
+import CommunityReviews from "@/components/Home/CommunityReviews";
 import NewRelease from "@/components/Home/NewRelease";
 import WhyChooseUs from "@/components/Home/WhyChooseUs";
 import Image from "next/image";
@@ -14,6 +15,9 @@ export default function Home() {
     </section>
     <section>
       <WhyChooseUs></WhyChooseUs>
+    </section>
+    <section>
+      <CommunityReviews></CommunityReviews>
     </section>
     
     </div>
