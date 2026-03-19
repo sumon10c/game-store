@@ -1,5 +1,6 @@
 import Banner from "@/components/Home/Banner";
 import NewRelease from "@/components/Home/NewRelease";
+import WhyChooseUs from "@/components/Home/WhyChooseUs";
 import Image from "next/image";
 
 export default function Home() {
@@ -11,6 +12,10 @@ export default function Home() {
     <section>
       <NewRelease></NewRelease>
     </section>
+    <section>
+      <WhyChooseUs></WhyChooseUs>
+    </section>
+    
     </div>
   );
 }
