@@ -1,97 +1,120 @@
 import React from "react";
 import { dbConnect } from "@/mongodb/dbConnect";
 import Link from "next/link";
+import SearchBar from "@/components/Games/SearchBar"; // ইমপোর্ট করো
 
 const page = async ({ searchParams }) => {
   const params = await searchParams;
   const currentPage = parseInt(params.page) || 1;
+  const searchQuery = params.search || ""; // সার্চ কুয়েরি ধরো
   const itemsPerPage = 12;
 
-  const gamesCollection = dbConnect("games");
+  const gamesCollection = await dbConnect("games");
 
-  const totalGames = await gamesCollection.countDocuments();
-  const totalPages = Math.ceil(totalGames / itemsPerPage);
+  // সার্চ ফিল্টার তৈরি
+  const query = searchQuery
+    ? { title: { $regex: searchQuery, $options: "i" } }
+    : {};
+
+  const totalGames = await gamesCollection.countDocuments(query);
+  const totalPages = Math.ceil(totalGames / itemsPerPage) || 1;
 
   const games = await gamesCollection
-    .find({})
+    .find(query)
     .skip((currentPage - 1) * itemsPerPage)
     .limit(itemsPerPage)
+    .sort({ createdAt: -1 })
     .toArray();
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-black text-white italic uppercase mb-10 border-l-4 border-indigo-500 pl-4">
-          All <span className="text-indigo-500">Games</span>
-        </h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+          <h1 className="text-4xl font-black text-white italic uppercase border-l-4 border-indigo-500 pl-4">
+            All <span className="text-indigo-500">Games</span>
+          </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {games.map((game) => (
-            <div
-              key={game._id.toString()}
-              className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-indigo-500 transition-all group flex flex-col"
+          <SearchBar />
+        </div>
+
+        {games.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {games.map((game) => (
+              <div
+                key={game._id.toString()}
+                className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-indigo-500 transition-all group flex flex-col"
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img
+                    src={game.thumbnail}
+                    alt={game.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-3 right-3 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">
+                    ${game.price}
+                  </div>
+                </div>
+                <div className="p-5 flex flex-col flex-grow">
+                  <h2 className="text-xl font-bold text-white mb-2 leading-tight line-clamp-1">
+                    {game.title}
+                  </h2>
+                  <p className="text-slate-400 text-sm mb-4 line-clamp-2 italic">
+                    "{game.description}"
+                  </p>
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="text-xs text-indigo-400 font-semibold uppercase italic">
+                      {game.category}
+                    </span>
+                    <Link
+                      href={`/games/${game._id.toString()}`}
+                      className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors text-center"
+                    >
+                      Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-slate-900/50 rounded-3xl border border-dashed border-slate-800">
+            <p className="text-slate-500 font-bold italic uppercase">
+              No games found for "{searchQuery}"
+            </p>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="mt-16 flex justify-center items-center gap-6">
+            <Link
+              href={`/games?page=${currentPage - 1}${
+                searchQuery ? `&search=${searchQuery}` : ""
+              }`}
+              className={`px-6 py-2 rounded-xl font-bold transition-all border border-indigo-500 ${
+                currentPage <= 1
+                  ? "opacity-30 pointer-events-none text-slate-500"
+                  : "text-indigo-500 hover:bg-indigo-500 hover:text-white"
+              }`}
             >
-              <div className="relative h-48 w-full overflow-hidden">
-                <img
-                  src={game.thumbnail}
-                  alt={game.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute top-3 right-3 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">
-                  ${game.price}
-                </div>
-              </div>
-
-              <div className="p-5 flex flex-col flex-grow">
-                <h2 className="text-xl font-bold text-white mb-2 leading-tight">
-                  {game.title}
-                </h2>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                  {game.description}
-                </p>
-                <div className="mt-auto flex items-center justify-between">
-                  <span className="text-xs text-indigo-400 font-semibold uppercase italic">
-                    {game.category}
-                  </span>
-                  <Link
-                    href={`/games/${game._id.toString()}`}
-                    className="bg-slate-800 hover:bg-indigo-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors text-center"
-                  >
-                    Details
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-16 flex justify-center items-center gap-6">
-          <Link
-            href={`/games?page=${currentPage - 1}`}
-            className={`px-6 py-2 rounded-xl font-bold transition-all border border-indigo-500 ${
-              currentPage <= 1
-                ? "opacity-30 cursor-not-allowed text-slate-500 border-slate-700"
-                : "text-indigo-500 hover:bg-indigo-500 hover:text-white"
-            }`}
-          >
-            Previous
-          </Link>
-
-          <span className="text-white font-mono bg-slate-900 px-4 py-2 rounded-lg border border-slate-800">
-            {currentPage} / {totalPages}
-          </span>
-
-          <Link
-            href={`/games?page=${currentPage + 1}`}
-            className={`px-6 py-2 rounded-xl font-bold transition-all border border-indigo-500 ${
-              currentPage >= totalPages
-                ? "opacity-30 cursor-not-allowed text-slate-500 border-slate-700"
-                : "text-indigo-500 hover:bg-indigo-500 hover:text-white"
-            }`}
-          >
-            Next
-          </Link>
-        </div>
+              Previous
+            </Link>
+            <span className="text-white font-mono bg-slate-900 px-4 py-2 rounded-lg border border-slate-800">
+              {currentPage} / {totalPages}
+            </span>
+            <Link
+              href={`/games?page=${currentPage + 1}${
+                searchQuery ? `&search=${searchQuery}` : ""
+              }`}
+              className={`px-6 py-2 rounded-xl font-bold transition-all border border-indigo-500 ${
+                currentPage >= totalPages
+                  ? "opacity-30 pointer-events-none text-slate-500"
+                  : "text-indigo-500 hover:bg-indigo-500 hover:text-white"
+              }`}
+            >
+              Next
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
