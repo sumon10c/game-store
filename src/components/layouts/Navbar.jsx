@@ -42,6 +42,9 @@ const Navbar = () => {
             <li>
               <Link href="/games">Games Store</Link>
             </li>
+            <li>
+              <Link href="/new-releases">New Release</Link>
+            </li>
 
             
             {session && (
@@ -97,6 +100,9 @@ const Navbar = () => {
           <li>
             <Link href="/trending">Trending</Link>
           </li>
+          <li>
+              <Link href="/new-releases">New Release</Link>
+            </li>
 
          
           {session && (
