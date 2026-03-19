@@ -71,7 +71,7 @@ The system follows a secure order pipeline:
 ## 👨‍💻 Developer
 **Sumon Chakrabarty**
 * Full Stack Developer | MERN & Next.js Enthusiast
-* [GitHub Profile](https://github.com/sumonc1)
+* [GitHub Profile](https://github.com/sumon10c)
 
 ---
 
